@@ -9,7 +9,6 @@ require "rspec/core/formatters/base_formatter"
 # Dumps rspec results as a JUnit XML file.
 # Based on XML schema: http://windyroad.org/dl/Open%20Source/JUnit.xsd
 class RSpecJUnitFormatter < RSpec::Core::Formatters::BaseFormatter
-  # rspec 2 and 3 implements are in separate files.
 
 private
 
@@ -166,7 +165,7 @@ private
 
   def escape(text)
     # Make sure it's utf-8, replace illegal characters with ruby-like escapes, and replace special and discouraged characters with entities
-    text.to_s.encode(Encoding::UTF_8).gsub(ILLEGAL_REGEXP, ILLEGAL_REPLACEMENT).gsub(DISCOURAGED_REGEXP, DISCOURAGED_REPLACEMENTS)
+    text.to_s.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '??invalid??').gsub(ILLEGAL_REGEXP, ILLEGAL_REPLACEMENT).gsub(DISCOURAGED_REGEXP, DISCOURAGED_REPLACEMENTS)
   end
 
   STRIP_DIFF_COLORS_BLOCK_REGEXP = /^ ( [ ]* ) Diff: (?: \e\[ 0 m )? (?: \n \1 \e\[ \d+ (?: ; \d+ )* m .* )* /x
@@ -188,8 +187,4 @@ end
 
 RspecJunitFormatter = RSpecJUnitFormatter
 
-if Gem::Version.new(RSpec::Core::Version::STRING) >= Gem::Version.new("3")
-  require "rspec_junit_formatter/rspec3"
-else
-  require "rspec_junit_formatter/rspec2"
-end
+require "rspec_junit_formatter/rspec3"
